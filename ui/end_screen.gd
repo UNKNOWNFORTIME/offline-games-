@@ -21,6 +21,7 @@ var _counting: bool = false
 var _collected: bool = false
 var _buttons: VBoxContainer
 var _col: VBoxContainer
+var _upgrade_refresh: Callable = Callable()
 var _tick_cd: float = 0.0
 
 
@@ -112,11 +113,11 @@ func _make_banner(win: bool) -> Control:
 	var color: Color = Palette.UI_ACCENT if win else Palette.ENEMY
 	var sb: StyleBoxFlat = UiKit.box(color, 36, 18, Palette.shade(color, 0.35))
 	sb.skew = Vector2(-0.08, 0)
-	sb.content_margin_left = 60
-	sb.content_margin_right = 60
+	sb.content_margin_left = 44
+	sb.content_margin_right = 44
 	ribbon.add_theme_stylebox_override("panel", sb)
 	ribbon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var l: Label = UiKit.label("LEVEL COMPLETE!" if win else "FAILED", 104 if win else 128, Color.WHITE, 14)
+	var l: Label = UiKit.label("LEVEL COMPLETE!" if win else "FAILED", 78 if win else 120, Color.WHITE, 14)
 	ribbon.add_child(l)
 	holder.add_child(ribbon)
 	# Drop-in with overshoot.
@@ -235,9 +236,8 @@ func add_upgrade(title_fn: Callable, cost_fn: Callable, buy_fn: Callable) -> voi
 		buy.text = "%s" % Economy.format(cost)
 		buy.disabled = not Economy.can_afford(cost)
 	refresh.call()
-	Economy.coins_changed.connect(func(_t: int, _d: int) -> void:
-		if is_instance_valid(buy):
-			refresh.call())
+	_upgrade_refresh = refresh
+	Economy.coins_changed.connect(_on_coins_changed)
 	buy.pressed.connect(func() -> void:
 		var cost: int = int(cost_fn.call())
 		if Economy.spend(cost):
@@ -252,6 +252,11 @@ func add_upgrade(title_fn: Callable, cost_fn: Callable, buy_fn: Callable) -> voi
 	coin.size = Vector2(56, 56)
 	buy.add_child(coin)
 	_col.add_child(card)
+
+
+func _on_coins_changed(_total: int, _delta: int) -> void:
+	if _upgrade_refresh.is_valid():
+		_upgrade_refresh.call()
 
 
 func _build_fail_buttons() -> void:

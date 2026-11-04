@@ -142,9 +142,7 @@ func open(results: Dictionary) -> void:
 	for u: Dictionary in UPGRADES:
 		cards.add_child(_make_card(u))
 	_refresh()
-	Economy.coins_changed.connect(func(_t: int, _d: int) -> void:
-		if is_instance_valid(_root):
-			_refresh())
+	Economy.coins_changed.connect(_on_coins_changed)
 
 	var spring := Control.new()
 	spring.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -215,6 +213,10 @@ func _make_card(u: Dictionary) -> Control:
 			_refresh())
 	_cards.append({"key": key, "lvl": lvl_l, "eff": eff_l, "buy": buy})
 	return card
+
+
+func _on_coins_changed(_total: int, _delta: int) -> void:
+	_refresh()
 
 
 func _refresh() -> void:
