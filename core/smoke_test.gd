@@ -5,6 +5,7 @@ extends Node
 ## screenshots, then quits. CI fails on any script/shader error in the log.
 
 var out_dir: String = ""
+var preview_filter: RegEx = null
 var _shot_index: int = 0
 
 
@@ -13,6 +14,9 @@ func _ready() -> void:
 	for a: String in OS.get_cmdline_user_args():
 		if a.begins_with("--smoke-out="):
 			out_dir = a.substr(12)
+		elif a.begins_with("--preview="):
+			preview_filter = RegEx.new()
+			preview_filter.compile(a.substr(10))
 	_run()
 
 
@@ -31,6 +35,16 @@ func shot(label: String) -> void:
 	_shot_index += 1
 	img.save_png(path)
 	print("SMOKE shot ", path)
+	if preview_filter != null and preview_filter.search(label) != null:
+		var small: Image = img.duplicate() as Image
+		small.resize(216, 384, Image.INTERPOLATE_BILINEAR)
+		var b64: String = Marshalls.raw_to_base64(small.save_jpg_to_buffer(0.55))
+		print("=====BEGIN %s=====" % label)
+		var i: int = 0
+		while i < b64.length():
+			print(b64.substr(i, 4000))
+			i += 4000
+		print("=====END %s=====" % label)
 
 
 func _run() -> void:

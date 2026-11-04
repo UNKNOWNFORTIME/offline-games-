@@ -22,7 +22,7 @@ var crowd: CrowdSwarm
 var enemy: CrowdSwarm
 var boss: CrowdBoss
 var cam: FollowCamera
-var hud: CrowdHud
+var hud: GameHud
 var gates: Array[GatePair] = []
 var obstacles: Array[CrowdObstacle] = []
 
@@ -103,7 +103,7 @@ func _ready() -> void:
 	cam.target = Vector3(0, 0, 0)
 	cam.snap()
 
-	hud = CrowdHud.new()
+	hud = GameHud.new()
 	add_child(hud)
 	hud.set_level(level_num)
 	hud.pause_pressed.connect(_open_pause)

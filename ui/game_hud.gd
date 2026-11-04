@@ -1,6 +1,6 @@
-class_name CrowdHud
+class_name GameHud
 extends CanvasLayer
-## In-run HUD: pause (top-left), level + progress (top-center), coins
+## Shared in-run HUD for every game: pause (top-left), level + progress (top-center), coins
 ## (top-right), "drag to start" hint with animated finger, banner toasts.
 
 signal pause_pressed
@@ -11,6 +11,8 @@ var _hint: Control
 var _finger: Control
 var _toast: Label
 var _hint_t: float = 0.0
+var _hint_label: Label
+var _right_slot: HBoxContainer
 
 
 class ProgressStrip:
@@ -78,6 +80,7 @@ func _ready() -> void:
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_hint)
 	var hl: Label = UiKit.label("HOLD & DRAG TO RUN", 70, Color.WHITE, 14)
+	_hint_label = hl
 	hl.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	hl.anchor_left = 0.0
 	hl.anchor_right = 1.0
@@ -107,6 +110,15 @@ func _make_finger() -> Control:
 		f.draw_rect(Rect2(62, 60, 36, 110), Color(1, 1, 1, 0.9))
 		f.draw_circle(Vector2(80, 170), 22, Color(1, 1, 1, 0.9)))
 	return f
+
+
+func set_hint_text(t: String) -> void:
+	_hint_label.text = t
+
+
+## Hide the drag finger (games with tap/swipe controls draw their own hint).
+func set_finger_visible(on: bool) -> void:
+	_finger.visible = on
 
 
 func set_level(n: int) -> void:
