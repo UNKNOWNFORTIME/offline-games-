@@ -21,8 +21,10 @@ var _move_node: Node3D
 var _bar_angle: float = 0.0
 var _saw_x: float = 0.0
 var _push_depth: float = 0.0
+## Hazards sit on one side so there is always a safe lane to steer into.
+var center_x: float = 0.0
 
-const BAR_HALF: float = 3.4
+const BAR_HALF: float = 2.1
 const BAR_THICK: float = 0.32
 const SAW_R: float = 0.95
 const PUSH_THICK: float = 0.75
@@ -51,11 +53,12 @@ func build(p_kind: Kind, p_z: float, half_width: float, seed_value: int) -> void
 	var metal: ShaderMaterial = Toon.mat(Palette.METAL.lightened(0.15), 0.04, 0.6)
 	match kind:
 		Kind.SPINNER:
-			_speed = rng.randf_range(1.6, 2.4) * _side
+			_speed = rng.randf_range(1.3, 1.9) * _side
 			reach_z = BAR_HALF + 0.4
-			_add(_cyl(0.32, 0.4, 1.3, 12), metal, Vector3(0, 0.65, 0))
+			center_x = _side * (half_width - BAR_HALF - 0.1)
+			_add(_cyl(0.32, 0.4, 1.3, 12), metal, Vector3(center_x, 0.65, 0))
 			_rot_node = Node3D.new()
-			_rot_node.position = Vector3(0, 0.55, 0)
+			_rot_node.position = Vector3(center_x, 0.55, 0)
 			add_child(_rot_node)
 			var bar := BoxMesh.new()
 			bar.size = Vector3(BAR_HALF * 2.0, 0.34, 0.34)
@@ -64,7 +67,7 @@ func build(p_kind: Kind, p_z: float, half_width: float, seed_value: int) -> void
 				var stripe := BoxMesh.new()
 				stripe.size = Vector3(0.35, 0.36, 0.36)
 				_add(stripe, white, Vector3(-2.4 + float(i) * 1.6, 0, 0), _rot_node)
-			_add(_cyl(0.42, 0.42, 0.2, 12), Toon.mat(Palette.GOLD, 0.03, 0.5), Vector3(0, 0.75, 0))
+			_add(_cyl(0.42, 0.42, 0.2, 12), Toon.mat(Palette.GOLD, 0.03, 0.5), Vector3(center_x, 0.75, 0))
 		Kind.SAW:
 			_speed = rng.randf_range(1.4, 2.0)
 			reach_z = SAW_R + 0.3
@@ -111,13 +114,15 @@ func _process(delta: float) -> void:
 			_rot_node.rotation.y = _bar_angle
 		Kind.SAW:
 			_saw_x = sin(_t * _speed + _phase) * (_half_w - 1.1)
+			center_x = _saw_x
 			_move_node.position.x = _saw_x
 			_rot_node.rotate_object_local(Vector3.UP, delta * 14.0)
 		Kind.PUSHER:
 			# Smooth slam-out, hold, retract cycle.
 			var c: float = 0.5 + 0.5 * sin(_t * _speed + _phase)
-			_push_depth = smoothstep(0.25, 0.75, c) * (_half_w * 2.0 * 0.62)
+			_push_depth = smoothstep(0.25, 0.75, c) * (_half_w * 2.0 * 0.5)
 			_move_node.position.x = _side * (_half_w - _push_depth)
+			center_x = _side * _half_w
 
 
 ## Is a world XZ point (unit foot position) inside the hazard right now?
@@ -129,7 +134,7 @@ func hits(p: Vector3) -> bool:
 		Kind.SPINNER:
 			# Distance to the rotating segment.
 			var dir := Vector2(cos(_bar_angle), -sin(_bar_angle))
-			var v := Vector2(p.x, lz)
+			var v := Vector2(p.x - center_x, lz)
 			var t: float = clampf(v.dot(dir), -BAR_HALF, BAR_HALF)
 			return v.distance_to(dir * t) < BAR_THICK + 0.12
 		Kind.SAW:

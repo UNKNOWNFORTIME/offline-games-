@@ -216,6 +216,11 @@ func _steer(delta: float, half_width: float) -> void:
 		var l: int = GatePair.apply(g.ops[0], crowd.count)
 		var r: int = GatePair.apply(g.ops[1], crowd.count)
 		_target_x = g.side_center_x(0 if l >= r else 1) * 0.7
+	if _autopilot:
+		for ob: CrowdObstacle in obstacles:
+			var dz: float = _crowd_z - ob.z_pos
+			if dz > -3.0 and dz < 10.0 and ob.kind != CrowdObstacle.Kind.SAW:
+				_target_x = -signf(ob.center_x) * (half_width - 1.4)
 	_target_x += _pending_dx * DRAG_SENS
 	_pending_dx = 0.0
 	var r: float = crowd.natural_radius()
