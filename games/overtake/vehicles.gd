@@ -161,8 +161,8 @@ static func _sphere(r: float) -> SphereMesh:
 	return m
 
 
+
 static var _baked: Dictionary = {}
-static var _baked_mat: ShaderMaterial = null
 
 
 ## Traffic vehicle as ONE mesh (vertex colors per part) -> 1 draw call.
@@ -172,45 +172,11 @@ static func traffic_baked(kind: Kind, color: Color) -> Dictionary:
 	if _baked.has(key):
 		return _baked[key]
 	var root: Node3D = traffic(kind, color)
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	_bake_node(st, root, Transform3D.IDENTITY)
-	st.index()
-	var info: Dictionary = {"mesh": st.commit(), "half_len": float(root.get_meta("half_len")), "half_w": float(root.get_meta("half_w"))}
+	var info: Dictionary = {"mesh": MeshBaker.bake(root), "half_len": float(root.get_meta("half_len")), "half_w": float(root.get_meta("half_w"))}
 	root.free()
 	_baked[key] = info
 	return info
 
 
 static func baked_material() -> ShaderMaterial:
-	if _baked_mat == null:
-		_baked_mat = Toon.unique(Color.WHITE, 0.0, 0.4)
-		_baked_mat.set_shader_parameter("use_vertex_color", true)
-	return _baked_mat
-
-
-static func _bake_node(st: SurfaceTool, node: Node, parent_xf: Transform3D) -> void:
-	for child: Node in node.get_children():
-		var n3: Node3D = child as Node3D
-		if n3 == null:
-			continue
-		var xf: Transform3D = parent_xf * n3.transform
-		var mi: MeshInstance3D = n3 as MeshInstance3D
-		if mi != null and mi.mesh is PrimitiveMesh:
-			var col: Color = Color.WHITE
-			var sm: ShaderMaterial = mi.material_override as ShaderMaterial
-			if sm != null:
-				col = sm.get_shader_parameter("base_color")
-				var es: Variant = sm.get_shader_parameter("emission_strength")
-				if es != null and float(es) > 0.0:
-					col = col.lightened(0.35)
-			var arrays: Array = (mi.mesh as PrimitiveMesh).get_mesh_arrays()
-			var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
-			var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
-			var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
-			var nb: Basis = xf.basis.inverse().transposed()
-			for idx: int in indices:
-				st.set_color(col)
-				st.set_normal((nb * normals[idx]).normalized())
-				st.add_vertex(xf * verts[idx])
-		_bake_node(st, n3, xf)
+	return MeshBaker.material(0.0)

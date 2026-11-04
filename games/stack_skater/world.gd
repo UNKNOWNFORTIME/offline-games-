@@ -124,12 +124,14 @@ func _build_features(level: Dictionary) -> void:
 				l.position = Vector3(0, 0.75 + hgt + 0.35, 0)
 				l.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 				root.add_child(l)
+				Toon.limit_range(root, 60.0)
 				pickups.append({"node": root, "x": float(fd["x"]), "z": fz, "amount": amount, "taken": false})
 			"gate":
 				var gp := GatePair.new()
 				add_child(gp)
 				gp.build(fz, str(fd["left"]), str(fd["right"]), HALF - 0.05)
 				gates.append(gp)
+				Toon.limit_range(gp, 70.0)
 			"spikes":
 				var side: float = float(fd["side"])
 				var inner: float = float(fd["inner"])

@@ -14,6 +14,8 @@ var _panels: Array[MeshInstance3D] = []
 var _labels: Array[Label3D] = []
 var _mats: Array[ShaderMaterial] = []
 var _half_w: float = 4.0
+static var _post_mesh_cache: ArrayMesh = null
+static var _post_cache_w: float = -1.0
 
 
 func build(p_z: float, left_op: String, right_op: String, half_width: float) -> void:
@@ -60,32 +62,41 @@ func build(p_z: float, left_op: String, right_op: String, half_width: float) -> 
 		add_child(l)
 		_labels.append(l)
 
-	# Posts + top beam (shared cached materials).
+	# Posts + gold caps, baked into ONE mesh (1 draw call per gate).
+	var tmp := Node3D.new()
 	var post_mesh := CylinderMesh.new()
 	post_mesh.top_radius = 0.16
 	post_mesh.bottom_radius = 0.18
 	post_mesh.height = POST_HEIGHT
 	post_mesh.radial_segments = 10
 	post_mesh.rings = 1
-	var post_mat: ShaderMaterial = Toon.mat(Palette.WHITE, 0.035, 0.3)
+	var cap_mesh := SphereMesh.new()
+	cap_mesh.radius = 0.26
+	cap_mesh.height = 0.52
+	cap_mesh.radial_segments = 10
+	cap_mesh.rings = 5
+	var post_mat: ShaderMaterial = Toon.mat(Palette.WHITE, 0.0, 0.3)
+	var cap_mat: ShaderMaterial = Toon.mat(Palette.GOLD, 0.0, 0.5)
 	for px: float in [-half_width, 0.0, half_width]:
 		var p := MeshInstance3D.new()
 		p.mesh = post_mesh
 		p.material_override = post_mat
 		p.position = Vector3(px, POST_HEIGHT * 0.5, 0)
-		p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(p)
+		tmp.add_child(p)
 		var cap := MeshInstance3D.new()
-		var cap_mesh := SphereMesh.new()
-		cap_mesh.radius = 0.26
-		cap_mesh.height = 0.52
-		cap_mesh.radial_segments = 10
-		cap_mesh.rings = 5
 		cap.mesh = cap_mesh
-		cap.material_override = Toon.mat(Palette.GOLD, 0.03, 0.5)
+		cap.material_override = cap_mat
 		cap.position = Vector3(px, POST_HEIGHT + 0.05, 0)
-		cap.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(cap)
+		tmp.add_child(cap)
+	if _post_mesh_cache == null or not is_equal_approx(_post_cache_w, half_width):
+		_post_mesh_cache = MeshBaker.bake(tmp)
+		_post_cache_w = half_width
+	tmp.free()
+	var posts := MeshInstance3D.new()
+	posts.mesh = _post_mesh_cache
+	posts.material_override = MeshBaker.material(0.035)
+	posts.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(posts)
 
 
 ## side: 0 left, 1 right. Returns the new count.

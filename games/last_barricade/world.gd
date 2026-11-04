@@ -3,7 +3,7 @@ extends Node3D
 ## Forest dirt road with tall pines, a rocky cliff on the left, drifting
 ## ground mist and the wooden barricade the player defends.
 
-const BARRICADE_Z: float = -1.7
+const BARRICADE_Z: float = -2.6
 
 var planks: Node3D
 

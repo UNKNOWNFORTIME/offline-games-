@@ -68,6 +68,18 @@ static func _shadow_tint_for(c: Color) -> Color:
 	return base.lerp(Color(0.62, 0.6, 0.85), 1.0 - hsv_s)
 
 
+## Hides every mesh under `node` beyond `dist` meters from the camera
+## (GPU-free culling of far props that fog would hide anyway).
+static func limit_range(node: Node, dist: float) -> void:
+	if node is GeometryInstance3D:
+		var g: GeometryInstance3D = node as GeometryInstance3D
+		g.visibility_range_end = dist
+		g.visibility_range_end_margin = 4.0
+		g.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
+	for c: Node in node.get_children():
+		limit_range(c, dist)
+
+
 ## Call after quality changes so cached materials pick up outline state.
 static func clear_cache() -> void:
 	_cache.clear()

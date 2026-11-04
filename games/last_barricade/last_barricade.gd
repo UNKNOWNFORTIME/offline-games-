@@ -32,6 +32,7 @@ var _view_model: Node3D
 var _muzzle: Vector3 = Vector3.ZERO
 var _flash_mesh: MeshInstance3D
 var _flash_light: OmniLight3D
+var _flash_mat: ShaderMaterial
 var _flash_time: float = 0.0
 var _tracers: Array[MeshInstance3D] = []
 var _tracer_life: PackedFloat32Array = PackedFloat32Array()
@@ -66,8 +67,8 @@ func _ready() -> void:
 	cam.near = 0.05
 	cam.far = 140.0
 	add_child(cam)
-	cam.position = Vector3(0, 1.75, 0.9)
-	cam.look_at(Vector3(0, 1.1, -30), Vector3.UP)
+	cam.position = Vector3(0, 2.3, 1.0)
+	cam.look_at(Vector3(0, 0.75, -30), Vector3.UP)
 	cam.current = true
 	_cam_base = cam.transform
 
@@ -126,16 +127,11 @@ func _build_view_model() -> void:
 	cam.add_child(_view_holder)
 	_flash_mesh = MeshInstance3D.new()
 	var q := QuadMesh.new()
-	q.size = Vector2(0.32, 0.32)
+	q.size = Vector2(0.17, 0.17)
 	_flash_mesh.mesh = q
-	var fm := StandardMaterial3D.new()
-	fm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	fm.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
-	fm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
-	fm.albedo_color = Color(1.0, 0.8, 0.35)
-	fm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	fm.no_depth_test = true
-	_flash_mesh.material_override = fm
+	_flash_mat = ShaderMaterial.new()
+	_flash_mat.shader = preload("res://shaders/muzzle_flash.gdshader")
+	_flash_mesh.material_override = _flash_mat
 	_flash_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_flash_mesh.visible = false
 	_view_holder.add_child(_flash_mesh)
@@ -372,7 +368,7 @@ func _fire() -> void:
 	# Feedback: sound, recoil, flash, shake, haptic.
 	AudioManager.play(str(ws["sfx"]), 0.08, -2.0, 0.0)
 	_recoil(float(ws["kick"]))
-	_flash_time = 0.05
+	_flash_time = minf(0.04, 0.5 / float(ws["fire_rate"]))
 	Juice.screen_shake(float(ws["shake"]), 0.12)
 	if _haptic_cd <= 0.0:
 		Haptics.light()
@@ -399,7 +395,7 @@ func _update_flash(delta: float) -> void:
 	_flash_mesh.visible = on
 	if on:
 		_flash_mesh.position = _view_model.position + _view_model.basis * _muzzle if _view_model != null else Vector3.ZERO
-		_flash_mesh.rotation.z = _rng.randf() * TAU
+		_flash_mat.set_shader_parameter("spin", _rng.randf() * TAU)
 		_flash_mesh.scale = Vector3.ONE * _rng.randf_range(0.8, 1.3)
 	if _flash_light != null:
 		_flash_light.position = _flash_mesh.position

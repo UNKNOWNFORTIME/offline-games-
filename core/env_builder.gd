@@ -23,8 +23,8 @@ static func build(parent: Node, preset: String = "sunny") -> DirectionalLight3D:
 			sky_mat.sky_horizon_color = Color("#C9D6CC")
 			sky_mat.ground_horizon_color = Color("#C9D6CC")
 			sky_mat.ground_bottom_color = Palette.FOREST
-			fog_color = Color("#B9C7BE")
-			fog_density = 0.02
+			fog_color = Color("#A9BAAE")
+			fog_density = 0.011
 			light.light_color = Color("#F3F1E4")
 		_:
 			sky_mat.sky_top_color = Color("#3E9BF0")

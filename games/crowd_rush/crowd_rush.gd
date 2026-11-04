@@ -67,6 +67,7 @@ func _ready() -> void:
 		add_child(gp)
 		gp.build(-float(gd["d"]), str(gd["left"]), str(gd["right"]), gate_half)
 		gates.append(gp)
+		Toon.limit_range(gp, 75.0)
 	var oi: int = 0
 	for o: Variant in level.get("obstacles", []):
 		var od: Dictionary = o
@@ -74,6 +75,7 @@ func _ready() -> void:
 		add_child(ob)
 		ob.build(CrowdObstacle.kind_from_string(str(od["type"])), -float(od["d"]), CrowdTrack.HALF_WIDTH, level_num * 31 + oi)
 		obstacles.append(ob)
+		Toon.limit_range(ob, 70.0)
 		oi += 1
 
 	crowd = CrowdSwarm.new()
