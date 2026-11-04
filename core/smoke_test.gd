@@ -35,6 +35,12 @@ func shot(label: String) -> void:
 	_shot_index += 1
 	img.save_png(path)
 	print("SMOKE shot ", path)
+	print("SMOKE perf %s draws=%d tris=%d nodes=%d objects=%d quality=%s" % [label,
+		int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+		int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)),
+		int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
+		int(Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)),
+		"high" if Settings.is_high() else "low"])
 	if preview_filter != null and preview_filter.search(label) != null:
 		var small: Image = img.duplicate() as Image
 		small.resize(216, 384, Image.INTERPOLATE_BILINEAR)
@@ -65,9 +71,11 @@ func _run() -> void:
 		var levels: Array = [3, 7] if id == "crowd_rush" else [2]
 		for lvl: Variant in levels:
 			await _play(id, int(lvl), 55.0)
-	# Low quality pass on the first game for comparison.
+	# Low quality pass on every game (perf budget check in the log).
 	Settings.set_quality(false)
-	await _play("crowd_rush", 2, 8.0)
+	for g: Dictionary in AppInfo.GAMES:
+		if str(g["scene"]) != "":
+			await _play(str(g["id"]), 4, 9.0)
 	Settings.set_quality(true)
 	print("SMOKE TEST PASSED")
 	get_tree().quit(0)

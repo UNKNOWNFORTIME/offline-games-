@@ -10,6 +10,10 @@ signal ad_started(kind: String)
 signal ad_finished(kind: String, rewarded: bool)
 
 const MOCK_DURATION: float = 2.0
+# Google's official TEST ids (see docs/ADMOB.md). Replace before release.
+const ADMOB_APP_ID: String = "ca-app-pub-3940256099942544~3347511713"
+const ADMOB_INTERSTITIAL_ID: String = "ca-app-pub-3940256099942544/1033173712"
+const ADMOB_REWARDED_ID: String = "ca-app-pub-3940256099942544/5224354917"
 const INTERSTITIAL_COOLDOWN_MS: int = 90_000
 const INTERSTITIAL_MIN_LEVEL: int = 3
 

@@ -9,6 +9,7 @@ var _probe_time: float = 0.0
 var _probe_frames: int = 0
 var _probing: bool = false
 var _title: Label
+var _gift_dot: Control
 
 
 func _ready() -> void:
@@ -25,6 +26,18 @@ func _ready() -> void:
 	var gear: Button = UiKit.icon_button("gear", Palette.UI_DARK_SOFT, 128)
 	gear.pressed.connect(_open_settings)
 	top.add_child(gear)
+	var gift: Button = UiKit.icon_button("gift", Palette.GOLD_SHADOW, 128)
+	gift.pressed.connect(_open_daily)
+	top.add_child(gift)
+	_gift_dot = Control.new()
+	_gift_dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_gift_dot.position = Vector2(100, 4)
+	_gift_dot.size = Vector2(30, 30)
+	_gift_dot.draw.connect(func() -> void:
+		_gift_dot.draw_circle(Vector2(15, 15), 15, Palette.ENEMY)
+		_gift_dot.draw_circle(Vector2(15, 15), 15, Color.WHITE, false, 4.0, true))
+	gift.add_child(_gift_dot)
+	_gift_dot.visible = DailyReward.can_claim()
 	var fill := Control.new()
 	fill.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(fill)
@@ -70,11 +83,24 @@ func _ready() -> void:
 
 	AudioManager.play_music("hub")
 	_probing = not Settings.quality_checked()
+	# Title drops in (doubles as the animated splash after the boot screen).
+	_title.modulate.a = 0.0
+	var tw: Tween = _title.create_tween().set_parallel(true)
+	tw.tween_property(_title, "modulate:a", 1.0, 0.3)
+	if DailyReward.can_claim() and not OS.get_cmdline_user_args().has("--smoke"):
+		await get_tree().create_timer(0.7).timeout
+		_open_daily()
 
 
 func _play(id: String) -> void:
 	Haptics.medium()
 	GameState.start_game(id)
+
+
+func _open_daily() -> void:
+	var d := DailyReward.new()
+	add_child(d)
+	d.closed.connect(func() -> void: _gift_dot.visible = DailyReward.can_claim())
 
 
 func _open_settings() -> void:

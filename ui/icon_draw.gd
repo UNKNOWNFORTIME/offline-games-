@@ -82,6 +82,12 @@ func _draw() -> void:
 			_coin(c, s * 0.4)
 			var f: Font = ThemeDB.fallback_font
 			draw_string(f, c + Vector2(-11, 13) * u, "$", HORIZONTAL_ALIGNMENT_LEFT, -1, int(40 * u), Palette.GOLD_SHADOW.darkened(0.3))
+		"gift":
+			draw_rect(Rect2(c + Vector2(-26, -8) * u, Vector2(52, 36) * u), color)
+			draw_rect(Rect2(c + Vector2(-30, -20) * u, Vector2(60, 14) * u), color.lightened(0.15))
+			draw_rect(Rect2(c + Vector2(-5, -20) * u, Vector2(10, 48) * u), Palette.ENEMY)
+			draw_circle(c + Vector2(-9, -25) * u, 8 * u, Palette.ENEMY)
+			draw_circle(c + Vector2(9, -25) * u, 8 * u, Palette.ENEMY)
 		"star":
 			var pts := PackedVector2Array()
 			for i: int in 10:
