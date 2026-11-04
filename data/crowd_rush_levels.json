@@ -1,0 +1,41 @@
+{
+	"_doc": "Crowd Rush hand-made levels. d = distance from start (m). left/right ops: +N, -N, xN, /N. Levels past this list are generated (CrowdLevels.generate).",
+	"levels": [
+		{
+			"length": 120,
+			"gates": [
+				{"d": 24, "left": "+4", "right": "+2"},
+				{"d": 50, "left": "+3", "right": "x2"},
+				{"d": 76, "left": "+10", "right": "/2"},
+				{"d": 100, "left": "-5", "right": "x3"}
+			],
+			"enemy": 12,
+			"boss_hp": 20
+		},
+		{
+			"length": 150,
+			"gates": [
+				{"d": 24, "left": "x2", "right": "+5"},
+				{"d": 50, "left": "x3", "right": "-3"},
+				{"d": 76, "left": "-10", "right": "+6"},
+				{"d": 102, "left": "/3", "right": "x2"},
+				{"d": 128, "left": "+15", "right": "-20"}
+			],
+			"enemy": 25,
+			"boss_hp": 24
+		},
+		{
+			"length": 172,
+			"gates": [
+				{"d": 24, "left": "+3", "right": "x2"},
+				{"d": 50, "left": "-2", "right": "+8"},
+				{"d": 76, "left": "x4", "right": "+10"},
+				{"d": 102, "left": "/2", "right": "-8"},
+				{"d": 126, "left": "+20", "right": "x2"},
+				{"d": 150, "left": "x2", "right": "-30"}
+			],
+			"enemy": 64,
+			"boss_hp": 50
+		}
+	]
+}

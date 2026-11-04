@@ -1,0 +1,64 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Arcade Rush"
+config/description="Offline arcade mini-games."
+run/main_scene="res://hub/hub.tscn"
+config/features=PackedStringArray("4.4", "Mobile")
+boot_splash/bg_color=Color(0.105882, 0.121569, 0.164706, 1)
+boot_splash/show_image=false
+config/icon="res://icon.svg"
+
+[autoload]
+
+SaveSystem="*res://autoload/save_system.gd"
+Settings="*res://autoload/settings.gd"
+Economy="*res://autoload/economy.gd"
+AudioManager="*res://autoload/audio_manager.gd"
+Haptics="*res://autoload/haptics.gd"
+AdService="*res://autoload/ad_service.gd"
+TouchInput="*res://core/touch_input.gd"
+Juice="*res://core/juice.gd"
+GameState="*res://autoload/game_state.gd"
+DebugOverlay="*res://core/debug_overlay.gd"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1920
+window/size/window_width_override=450
+window/size/window_height_override=900
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[physics]
+
+common/physics_ticks_per_second=60
+
+[rendering]
+
+renderer/rendering_method="mobile"
+renderer/rendering_method.mobile="mobile"
+rendering_device/fallback_to_opengl3=true
+textures/vram_compression/import_etc2_astc=true
+lights_and_shadows/directional_shadow/size=2048
+lights_and_shadows/directional_shadow/size.mobile=1024
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=1
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality.mobile=0
+lights_and_shadows/positional_shadow/atlas_size=0
+environment/defaults/default_clear_color=Color(0.431, 0.776, 1, 1)
+anti_aliasing/quality/msaa_3d=1
