@@ -18,11 +18,18 @@ core/       palette, toon (material factory), ui_kit, pool, touch_input (autoloa
 shaders/    toon_light.gdshaderinc (shared cel lighting), toon, outline, crowd_unit,
             gate_panel, track, water, badge, particle
 hub/        hub.tscn/gd, game_card, card_art (code-drawn animated illustrations), hub_background
-games/crowd_rush/  crowd_rush.tscn/gd (state machine), crowd (MultiMesh swarm), runner_mesh,
-            gate_pair, boss, track (world builder), levels (JSON + generator), hud
-ui/         ui_theme (code-built theme), icon_draw, coin_pill, end_screen, pause_menu,
-            settings_panel, confetti, fonts/
-data/       crowd_rush_levels.json
+games/crowd_rush/      state machine, crowd (MultiMesh swarm), runner_mesh, gate_pair, obstacle,
+                       boss, track (world), levels (JSON + generator)
+games/stack_skater/    skater (rig + MultiMesh coin bar), world (city/track/features/ramp), levels
+games/overtake/        overtake (state machine), road (recycled strips + MultiMeshes),
+                       vehicles (player car + baked 1-draw-call traffic), garage (upgrades UI)
+games/last_barricade/  last_barricade (aim/fire/waves), shambler (pooled enemy), weapons, world
+ui/         ui_theme (code-built theme), game_hud (shared HUD), icon_draw, coin_pill, end_screen,
+            pause_menu, settings_panel, daily_reward, confetti, fonts/
+data/       crowd_rush_levels.json, barricade_waves.json
+docs/       PRIVACY_POLICY.md, STORE_LISTING.md, ADMOB.md
+.github/workflows/build.yml  CI: real Godot 4.4.1 smoke test (autopilot, screenshots,
+            draw-call telemetry) + signed debug APK artifact
 audio/      sfx/ music/ (drop-in files override synth placeholders; see audio/README.md)
 ```
 
@@ -49,18 +56,24 @@ audio/      sfx/ music/ (drop-in files override synth placeholders; see audio/RE
 - Fonts: drop `LilitaOne-Regular.ttf` (or Baloo 2) into `ui/fonts/` → used automatically.
 - Name lives in `AppInfo.GAME_NAME` (+ project.godot + export preset package name).
 
+## CI / verification
+Every push runs `.github/workflows/build.yml`: imports the project with Godot 4.4.1,
+runs `godot -- --smoke` under xvfb + lavapipe (real Mobile/Vulkan rendering) which plays
+every game on autopilot (`smoke_start()` in each game scene), saves screenshots, logs
+`SMOKE perf` lines (draw calls/tris/nodes), fails on any SCRIPT/SHADER error, then
+exports a signed debug APK (artifact "ArcadeRush-debug-apk").
+Each game scene must implement `smoke_start()` and put its end screen in group `end_screen`.
+
 ## Status
-- [x] Phase 0 — Foundation (autoloads, touch input, juice, palette, shaders, UI kit,
-      hub, settings, save/load, transitions, debug overlay, Android preset)
-- [x] Phase 1 — Crowd Rush core (track, steering, 4 gate ops, MultiMesh spiral crowd,
-      counter, clash, boss + HP, win/fail, end screen + coins, 3 hand-made levels;
-      levels 4+ come from the generator already)
-- [ ] Phase 2 — Crowd Rush polish (obstacles, 10 hand levels, start-crowd upgrade UI,
-      revive, remaining VFX)
-- [ ] Phase 3 Stack Skater · [ ] Phase 4 Overtake · [ ] Phase 5 Last Barricade · [ ] Phase 6 Release
+- [x] Phase 0 — Foundation
+- [x] Phase 1 — Crowd Rush core
+- [x] Phase 2 — Crowd Rush polish (obstacles, 10 hand levels, generator, revive, upgrade)
+- [x] Phase 3 — Stack Skater
+- [x] Phase 4 — Overtake
+- [x] Phase 5 — Last Barricade
+- [~] Phase 6 — daily reward, docs, release preset, perf telemetry done;
+      real AdMob plugin integration pending (see docs/ADMOB.md), icon PNG set optional.
 
 ## Known gaps / notes
-- Scripts were written without running the Godot editor in the authoring
-  environment; first open in the editor may surface small API issues — fix forward.
-- The auto-quality probe measures the 2D Hub (per spec); a 3D in-game probe may be
-  a better signal later.
+- AdMob is still the mock (plugin needs a Gradle build; see docs/ADMOB.md).
+- The auto-quality probe measures the 2D Hub (per spec).

@@ -3,7 +3,14 @@
 Offline Android arcade bundle built with Godot 4 (GDScript). See `GAME_SPEC.md`.
 Everything visual and every placeholder sound is generated in code — no assets needed.
 
-## What you need
+## Fastest way to try it (no setup)
+Every push builds a signed debug APK on GitHub Actions:
+GitHub repo ▸ **Actions** ▸ latest "Validate & build APK" run ▸ **Artifacts** ▸
+`ArcadeRush-debug-apk` → unzip → copy `ArcadeRush-debug.apk` to your phone → open it
+(allow "Install unknown apps"). You can do this from the phone's browser
+(you must be signed in to GitHub to download artifacts).
+
+## What you need (to build yourself)
 | Tool | Version |
 |---|---|
 | Godot | **4.4.x stable** or newer 4.x (standard build, not .NET) |
@@ -54,6 +61,24 @@ Space = tap, F3 = debug overlay.
 - Pause button (top-left) → Resume / Restart / Home and quick sound toggles.
   Switching apps mid-run auto-pauses.
 - Levels 1–3 are hand-made; level 4+ are generated (always winnable).
+
+**Crowd Rush (levels 3+)** — spinning bars, sliding saws and side pushers sit on one side
+of the track; steer the blob around them or lose runners one by one. Win screens show a
+"Starting crowd +1" upgrade; fail screens offer one rewarded REVIVE per level.
+
+**Stack Skater** — drag to steer. Your coin bar widens as you grab stacks (wider = reaches
+more pickups), spike strips cut coins off that side, narrow walls scrape both ends, gates
+multiply. At the end the skater climbs the x1..x10 ramp, paying coins per step.
+
+**Overtake** — garage first (3 upgrade cards + DRIVE). Swipe left/right to change lane,
+hold anywhere (without moving) to boost until stamina runs out. Passing close to a car pays
+coins ("$" text, speed-line flash, combo toast). Crash → results, x3 ad, upgrades.
+
+**Last Barricade** — drag anywhere to move the crosshair, keep a finger down to auto-fire.
+Head hits do double damage. Plank shields absorb frontal hits until they break. When a green
+glowing weapon appears, tap it to grab it. Clear the wave before the barricade breaks.
+
+**Hub extras** — gift button: 7-day daily reward streak (opens automatically when ready).
 
 ## Short-video moments
 1. Level 3, gate 3: take **×4** at 12 → crowd blooms to 48 with a FOV punch.
