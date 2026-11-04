@@ -92,7 +92,7 @@ func _try_load(base_path: String) -> AudioStream:
 
 
 ## Plays a one-shot SFX with ±pitch_var random pitch (spec: ±8% on repeats).
-func play(sfx_name: String, pitch_var: float = 0.0, volume_db: float = 0.0, min_interval: float = 0.03) -> void:
+func play(sfx_name: String, pitch_var: float = 0.0, volume_db: float = 0.0, min_interval: float = 0.03, pitch: float = 1.0) -> void:
 	if not Settings.sound:
 		return
 	if not _streams.has(sfx_name):
@@ -105,7 +105,7 @@ func play(sfx_name: String, pitch_var: float = 0.0, volume_db: float = 0.0, min_
 	var p: AudioStreamPlayer = _voices[_next_voice]
 	_next_voice = (_next_voice + 1) % VOICES
 	p.stream = _streams[sfx_name]
-	p.pitch_scale = 1.0 + randf_range(-pitch_var, pitch_var)
+	p.pitch_scale = pitch * (1.0 + randf_range(-pitch_var, pitch_var))
 	p.volume_db = volume_db
 	p.play()
 
