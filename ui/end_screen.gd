@@ -8,6 +8,7 @@ extends CanvasLayer
 signal next_pressed
 signal retry_pressed
 signal home_pressed
+signal revive_granted
 
 var _root: Control
 var _dim: ColorRect
@@ -19,6 +20,7 @@ var _shown_coins: float = 0.0
 var _counting: bool = false
 var _collected: bool = false
 var _buttons: VBoxContainer
+var _col: VBoxContainer
 var _tick_cd: float = 0.0
 
 
@@ -48,6 +50,7 @@ func open(win: bool, coins: int, subtitle: String = "") -> void:
 	var safe := SafeArea.new()
 	_root.add_child(safe)
 	var col := VBoxContainer.new()
+	_col = col
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_theme_constant_override("separation", 34)
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -178,6 +181,77 @@ func _on_no_thanks(x3: Button, no_thanks: Button) -> void:
 	x3.disabled = true
 	no_thanks.disabled = true
 	_collect(_coins)
+
+
+## Fail screen: big rewarded REVIVE button above RETRY (once per level).
+func add_revive() -> void:
+	var rv: Button = UiKit.button("  REVIVE", Palette.GOLD, 72, Vector2(680, 170), Palette.UI_DARK)
+	var ad_icon := IconDraw.new()
+	ad_icon.kind = "ad"
+	ad_icon.color = Palette.UI_DARK
+	ad_icon.position = Vector2(60, 30)
+	ad_icon.size = Vector2(90, 90)
+	rv.add_child(ad_icon)
+	_buttons.add_child(rv)
+	_buttons.move_child(rv, 0)
+	_pulse(rv)
+	rv.disabled = not AdService.is_rewarded_ready()
+	rv.pressed.connect(func() -> void:
+		if _collected:
+			return
+		rv.disabled = true
+		AdService.show_rewarded(_on_revive_ad))
+
+
+func _on_revive_ad(ok: bool) -> void:
+	if not ok or _collected:
+		return
+	_collected = true
+	revive_granted.emit()
+	var t: Tween = create_tween()
+	t.tween_property(_root, "modulate:a", 0.0, 0.2)
+	t.tween_callback(queue_free)
+
+
+## Small upgrade card under the buttons. title_fn() -> String, cost_fn() -> int,
+## buy_fn() performs the upgrade after coins were spent.
+func add_upgrade(title_fn: Callable, cost_fn: Callable, buy_fn: Callable) -> void:
+	var card: PanelContainer = UiKit.panel(Color(Palette.UI_DARK, 0.85), 40)
+	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	card.custom_minimum_size = Vector2(760, 0)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 20)
+	card.add_child(row)
+	var l: Label = UiKit.label(str(title_fn.call()), 44, Color.WHITE, 6)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	row.add_child(l)
+	var buy: Button = UiKit.button("", Palette.UI_ACCENT, 46, Vector2(260, 120))
+	row.add_child(buy)
+	var refresh: Callable = func() -> void:
+		var cost: int = int(cost_fn.call())
+		l.text = str(title_fn.call())
+		buy.text = "%s" % Economy.format(cost)
+		buy.disabled = not Economy.can_afford(cost)
+	refresh.call()
+	Economy.coins_changed.connect(func(_t: int, _d: int) -> void:
+		if is_instance_valid(buy):
+			refresh.call())
+	buy.pressed.connect(func() -> void:
+		var cost: int = int(cost_fn.call())
+		if Economy.spend(cost):
+			buy_fn.call()
+			AudioManager.play("pickup")
+			Haptics.medium()
+			Juice.punch_scale(card, 0.12, 0.3)
+			refresh.call())
+	var coin := IconDraw.new()
+	coin.kind = "coin"
+	coin.position = Vector2(14, 24)
+	coin.size = Vector2(56, 56)
+	buy.add_child(coin)
+	_col.add_child(card)
 
 
 func _build_fail_buttons() -> void:

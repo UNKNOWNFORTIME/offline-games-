@@ -4,10 +4,26 @@
 		{
 			"length": 120,
 			"gates": [
-				{"d": 24, "left": "+4", "right": "+2"},
-				{"d": 50, "left": "+3", "right": "x2"},
-				{"d": 76, "left": "+10", "right": "/2"},
-				{"d": 100, "left": "-5", "right": "x3"}
+				{
+					"d": 24,
+					"left": "+4",
+					"right": "+2"
+				},
+				{
+					"d": 50,
+					"left": "+3",
+					"right": "x2"
+				},
+				{
+					"d": 76,
+					"left": "+10",
+					"right": "/2"
+				},
+				{
+					"d": 100,
+					"left": "-5",
+					"right": "x3"
+				}
 			],
 			"enemy": 12,
 			"boss_hp": 20
@@ -15,11 +31,31 @@
 		{
 			"length": 150,
 			"gates": [
-				{"d": 24, "left": "x2", "right": "+5"},
-				{"d": 50, "left": "x3", "right": "-3"},
-				{"d": 76, "left": "-10", "right": "+6"},
-				{"d": 102, "left": "/3", "right": "x2"},
-				{"d": 128, "left": "+15", "right": "-20"}
+				{
+					"d": 24,
+					"left": "x2",
+					"right": "+5"
+				},
+				{
+					"d": 50,
+					"left": "x3",
+					"right": "-3"
+				},
+				{
+					"d": 76,
+					"left": "-10",
+					"right": "+6"
+				},
+				{
+					"d": 102,
+					"left": "/3",
+					"right": "x2"
+				},
+				{
+					"d": 128,
+					"left": "+15",
+					"right": "-20"
+				}
 			],
 			"enemy": 25,
 			"boss_hp": 24
@@ -27,15 +63,448 @@
 		{
 			"length": 172,
 			"gates": [
-				{"d": 24, "left": "+3", "right": "x2"},
-				{"d": 50, "left": "-2", "right": "+8"},
-				{"d": 76, "left": "x4", "right": "+10"},
-				{"d": 102, "left": "/2", "right": "-8"},
-				{"d": 126, "left": "+20", "right": "x2"},
-				{"d": 150, "left": "x2", "right": "-30"}
+				{
+					"d": 24,
+					"left": "+3",
+					"right": "x2"
+				},
+				{
+					"d": 50,
+					"left": "-2",
+					"right": "+8"
+				},
+				{
+					"d": 76,
+					"left": "x4",
+					"right": "+10"
+				},
+				{
+					"d": 102,
+					"left": "/2",
+					"right": "-8"
+				},
+				{
+					"d": 126,
+					"left": "+20",
+					"right": "x2"
+				},
+				{
+					"d": 150,
+					"left": "x2",
+					"right": "-30"
+				}
 			],
 			"enemy": 64,
+			"boss_hp": 50,
+			"obstacles": [
+				{
+					"d": 89,
+					"type": "spinner"
+				}
+			]
+		},
+		{
+			"length": 180,
+			"gates": [
+				{
+					"d": 24,
+					"left": "+5",
+					"right": "x2"
+				},
+				{
+					"d": 50,
+					"left": "x3",
+					"right": "-4"
+				},
+				{
+					"d": 76,
+					"left": "-8",
+					"right": "+12"
+				},
+				{
+					"d": 102,
+					"left": "x2",
+					"right": "/2"
+				},
+				{
+					"d": 128,
+					"left": "+20",
+					"right": "-15"
+				},
+				{
+					"d": 154,
+					"left": "x2",
+					"right": "+30"
+				}
+			],
+			"obstacles": [
+				{
+					"d": 63,
+					"type": "spinner"
+				},
+				{
+					"d": 115,
+					"type": "saw"
+				}
+			],
+			"enemy": 55,
 			"boss_hp": 50
+		},
+		{
+			"length": 185,
+			"gates": [
+				{
+					"d": 24,
+					"left": "x2",
+					"right": "+4"
+				},
+				{
+					"d": 50,
+					"left": "+10",
+					"right": "-3"
+				},
+				{
+					"d": 76,
+					"left": "/2",
+					"right": "x3"
+				},
+				{
+					"d": 102,
+					"left": "+15",
+					"right": "x2"
+				},
+				{
+					"d": 128,
+					"left": "-20",
+					"right": "+25"
+				},
+				{
+					"d": 154,
+					"left": "x2",
+					"right": "/3"
+				}
+			],
+			"obstacles": [
+				{
+					"d": 37,
+					"type": "saw"
+				},
+				{
+					"d": 89,
+					"type": "pusher"
+				},
+				{
+					"d": 141,
+					"type": "spinner"
+				}
+			],
+			"enemy": 80,
+			"boss_hp": 70
+		},
+		{
+			"length": 195,
+			"gates": [
+				{
+					"d": 24,
+					"left": "+6",
+					"right": "+3"
+				},
+				{
+					"d": 50,
+					"left": "x3",
+					"right": "/2"
+				},
+				{
+					"d": 76,
+					"left": "-10",
+					"right": "x2"
+				},
+				{
+					"d": 102,
+					"left": "+30",
+					"right": "-25"
+				},
+				{
+					"d": 128,
+					"left": "x2",
+					"right": "+40"
+				},
+				{
+					"d": 154,
+					"left": "-30",
+					"right": "x2"
+				},
+				{
+					"d": 180,
+					"left": "+50",
+					"right": "-40"
+				}
+			],
+			"obstacles": [
+				{
+					"d": 63,
+					"type": "pusher"
+				},
+				{
+					"d": 115,
+					"type": "spinner"
+				},
+				{
+					"d": 167,
+					"type": "saw"
+				}
+			],
+			"enemy": 140,
+			"boss_hp": 100
+		},
+		{
+			"length": 200,
+			"gates": [
+				{
+					"d": 24,
+					"left": "x2",
+					"right": "+3"
+				},
+				{
+					"d": 50,
+					"left": "x2",
+					"right": "-1"
+				},
+				{
+					"d": 76,
+					"left": "+12",
+					"right": "x3"
+				},
+				{
+					"d": 102,
+					"left": "/2",
+					"right": "-10"
+				},
+				{
+					"d": 128,
+					"left": "x2",
+					"right": "+20"
+				},
+				{
+					"d": 154,
+					"left": "+40",
+					"right": "/2"
+				},
+				{
+					"d": 180,
+					"left": "x2",
+					"right": "-50"
+				}
+			],
+			"obstacles": [
+				{
+					"d": 37,
+					"type": "spinner"
+				},
+				{
+					"d": 89,
+					"type": "saw"
+				},
+				{
+					"d": 141,
+					"type": "pusher"
+				},
+				{
+					"d": 165,
+					"type": "spinner"
+				}
+			],
+			"enemy": 50,
+			"boss_hp": 45
+		},
+		{
+			"length": 205,
+			"gates": [
+				{
+					"d": 24,
+					"left": "+8",
+					"right": "x2"
+				},
+				{
+					"d": 50,
+					"left": "x2",
+					"right": "-5"
+				},
+				{
+					"d": 76,
+					"left": "-12",
+					"right": "x3"
+				},
+				{
+					"d": 102,
+					"left": "+25",
+					"right": "/2"
+				},
+				{
+					"d": 128,
+					"left": "x2",
+					"right": "-30"
+				},
+				{
+					"d": 154,
+					"left": "+60",
+					"right": "x2"
+				},
+				{
+					"d": 180,
+					"left": "-80",
+					"right": "+50"
+				}
+			],
+			"obstacles": [
+				{
+					"d": 63,
+					"type": "saw"
+				},
+				{
+					"d": 89,
+					"type": "spinner"
+				},
+				{
+					"d": 141,
+					"type": "pusher"
+				},
+				{
+					"d": 167,
+					"type": "saw"
+				}
+			],
+			"enemy": 140,
+			"boss_hp": 120
+		},
+		{
+			"length": 210,
+			"gates": [
+				{
+					"d": 24,
+					"left": "x3",
+					"right": "+5"
+				},
+				{
+					"d": 50,
+					"left": "+10",
+					"right": "-2"
+				},
+				{
+					"d": 76,
+					"left": "x2",
+					"right": "/2"
+				},
+				{
+					"d": 102,
+					"left": "-20",
+					"right": "+30"
+				},
+				{
+					"d": 128,
+					"left": "x2",
+					"right": "-40"
+				},
+				{
+					"d": 154,
+					"left": "/3",
+					"right": "x2"
+				},
+				{
+					"d": 180,
+					"left": "+80",
+					"right": "-60"
+				}
+			],
+			"obstacles": [
+				{
+					"d": 37,
+					"type": "pusher"
+				},
+				{
+					"d": 63,
+					"type": "spinner"
+				},
+				{
+					"d": 115,
+					"type": "saw"
+				},
+				{
+					"d": 167,
+					"type": "pusher"
+				}
+			],
+			"enemy": 120,
+			"boss_hp": 110
+		},
+		{
+			"length": 220,
+			"gates": [
+				{
+					"d": 24,
+					"left": "x2",
+					"right": "+6"
+				},
+				{
+					"d": 50,
+					"left": "x3",
+					"right": "-3"
+				},
+				{
+					"d": 76,
+					"left": "+20",
+					"right": "/2"
+				},
+				{
+					"d": 102,
+					"left": "x2",
+					"right": "-15"
+				},
+				{
+					"d": 128,
+					"left": "-40",
+					"right": "+50"
+				},
+				{
+					"d": 154,
+					"left": "x2",
+					"right": "/2"
+				},
+				{
+					"d": 180,
+					"left": "+100",
+					"right": "-80"
+				},
+				{
+					"d": 206,
+					"left": "x2",
+					"right": "+60"
+				}
+			],
+			"obstacles": [
+				{
+					"d": 37,
+					"type": "saw"
+				},
+				{
+					"d": 89,
+					"type": "spinner"
+				},
+				{
+					"d": 141,
+					"type": "pusher"
+				},
+				{
+					"d": 167,
+					"type": "saw"
+				},
+				{
+					"d": 193,
+					"type": "spinner"
+				}
+			],
+			"enemy": 280,
+			"boss_hp": 230
 		}
 	]
 }

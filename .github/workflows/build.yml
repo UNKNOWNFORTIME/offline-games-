@@ -47,10 +47,11 @@ jobs:
 
       - name: Smoke test (real rendering, autopilot through every game, screenshots)
         run: |
-          mkdir -p shots
+          SHOTS=$RUNNER_TEMP/shots
+          mkdir -p $SHOTS
           set +e
           timeout 900 xvfb-run -a -s "-screen 0 1280x1024x24" ~/godot/godot --path . --resolution 540x960 \
-            --audio-driver Dummy -- --smoke --smoke-out=$PWD/shots 2>&1 | tee smoke.log
+            --audio-driver Dummy -- --smoke --smoke-out=$SHOTS 2>&1 | tee smoke.log
           code=${PIPESTATUS[0]}
           echo "exit code: $code"
           echo "===== errors ====="
@@ -65,7 +66,7 @@ jobs:
         with:
           name: smoke-screenshots
           path: |
-            shots/
+            ${{ runner.temp }}/shots/
             smoke.log
             import.log
             errors.txt
@@ -109,3 +110,14 @@ jobs:
             build/ArcadeRush-debug.apk
             export.log
           if-no-files-found: warn
+
+      - name: Print screenshot previews (base64 JPEG, for remote review)
+        if: always()
+        run: |
+          cd $RUNNER_TEMP/shots 2>/dev/null || exit 0
+          for f in $(ls *.png | grep -E "${PREVIEW_FILTER:-hub|settings|ready|t05|t12|t19|end}" | head -40); do
+            convert "$f" -resize 300x534 -quality 62 "/tmp/p.jpg"
+            echo "=====BEGIN $f====="
+            base64 -w 2000 /tmp/p.jpg
+            echo "=====END $f====="
+          done

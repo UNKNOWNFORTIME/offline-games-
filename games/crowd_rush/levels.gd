@@ -41,7 +41,12 @@ static func _normalize(raw: Dictionary) -> Dictionary:
 	for g: Variant in raw.get("gates", []):
 		var gd: Dictionary = g
 		gates.append({"d": float(gd["d"]), "left": str(gd["left"]), "right": str(gd["right"])})
+	var obstacles: Array = []
+	for o: Variant in raw.get("obstacles", []):
+		var od: Dictionary = o
+		obstacles.append({"d": float(od["d"]), "type": str(od["type"])})
 	return {
+		"obstacles": obstacles,
 		"length": float(raw.get("length", 140)),
 		"gates": gates,
 		"enemy": int(raw.get("enemy", 10)),
@@ -67,7 +72,13 @@ static func best_margin(level: Dictionary, start: int, level_num: int) -> int:
 	var c: int = best_path(level, start)
 	var boss_hp: int = int(level["boss_hp"])
 	var stomps: int = 2
-	return c - int(level["enemy"]) - boss_hp - stomps * stomp_kills(level_num)
+	var obs: int = (level.get("obstacles", []) as Array).size()
+	return c - int(level["enemy"]) - boss_hp - stomps * stomp_kills(level_num) - obs * obstacle_cost(c)
+
+
+## Expected units lost per obstacle for an average player.
+static func obstacle_cost(best: int) -> int:
+	return maxi(3, int(float(best) * 0.04))
 
 
 static func generate(n: int) -> Dictionary:
@@ -97,14 +108,24 @@ static func generate(n: int) -> Dictionary:
 		gates.append({"d": 24.0 + spacing * float(i), "left": left, "right": right})
 		c = maxi(GatePair.apply(left, c), GatePair.apply(right, c))
 	var best: int = c
+	var obstacles: Array = []
+	if n >= 3:
+		var kinds: Array[String] = ["spinner", "saw", "pusher"]
+		var oc: int = clampi((n - 1) / 3, 1, gate_count - 1)
+		var slots: Array = range(gate_count - 1)
+		for k: int in oc:
+			var pick: int = rng.randi_range(0, slots.size() - 1)
+			var gi: int = int(slots[pick])
+			slots.remove_at(pick)
+			obstacles.append({"d": 24.0 + spacing * (float(gi) + 0.5), "type": kinds[rng.randi_range(0, 2)]})
 	# Share of the best result spent on enemy + boss grows with difficulty.
 	var pressure: float = lerpf(0.5, 0.82, diff) + rng.randf_range(-0.04, 0.04)
 	var stomp_cost: int = 2 * stomp_kills(n)
-	var budget: int = maxi(4, int(float(best) * pressure) - stomp_cost)
+	var budget: int = maxi(4, int(float(best) * pressure) - stomp_cost - obstacles.size() * obstacle_cost(best))
 	var enemy_share: float = rng.randf_range(0.45, 0.62)
 	var enemy: int = maxi(3, int(float(budget) * enemy_share))
 	var boss_hp: int = maxi(8, budget - enemy)
-	var level: Dictionary = {"length": length, "gates": gates, "enemy": enemy, "boss_hp": boss_hp}
+	var level: Dictionary = {"length": length, "gates": gates, "obstacles": obstacles, "enemy": enemy, "boss_hp": boss_hp}
 	# Guarantee: best path must leave survivors.
 	var min_margin: int = maxi(3, int(float(best) * 0.06))
 	while best_margin(level, 1, n) < min_margin:

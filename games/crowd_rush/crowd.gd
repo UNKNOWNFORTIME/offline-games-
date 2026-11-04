@@ -185,6 +185,49 @@ func set_count(n: int, animate: bool = true) -> void:
 		_shown_count = float(n)
 
 
+## Removes every visible unit currently inside the obstacle's danger shape.
+## A reserve unit (count above the visible cap) pops back into the slot;
+## otherwise the last visible unit is moved into it and glides into place.
+## Returns how many units were lost.
+func kill_where(obs: CrowdObstacle) -> int:
+	var killed: int = 0
+	var origin: Vector3 = global_position
+	var old: int = count
+	var i: int = visible_count - 1
+	while i >= 0:
+		if _age[i] > POP_TIME * 0.5:
+			var wp: Vector3 = origin + _pos[i]
+			if obs.hits(wp):
+				killed += 1
+				if killed <= 5:
+					Juice.puff(wp + Vector3(0, 0.45, 0), team_color.lightened(0.35))
+				_remove_at(i)
+		i -= 1
+	if killed > 0:
+		_mm.visible_instance_count = visible_count
+		count_changed.emit(count, count - old)
+		if _label != null:
+			Juice.punch_scale(_label, 0.15, 0.25)
+	return killed
+
+
+func _remove_at(i: int) -> void:
+	count = maxi(0, count - 1)
+	if count >= visible_count:
+		# A reserve unit takes the slot after a short beat.
+		var s: Vector2 = _slots[i]
+		_pos[i] = Vector3(s.x * _sx, 0.0, s.y * _sz)
+		_age[i] = -0.25
+		return
+	var last: int = visible_count - 1
+	if i != last:
+		_pos[i] = _pos[last]
+		_age[i] = _age[last]
+		_phase[i] = _phase[last]
+		_tint[i] = _tint[last]
+	visible_count = last
+
+
 ## World position of a unit near the front (for effects).
 func front_world_point(forward_sign: float = -1.0) -> Vector3:
 	return to_global(Vector3(0, 0.5, extent_z() * forward_sign))

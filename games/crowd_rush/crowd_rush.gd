@@ -24,6 +24,7 @@ var boss: CrowdBoss
 var cam: FollowCamera
 var hud: CrowdHud
 var gates: Array[GatePair] = []
+var obstacles: Array[CrowdObstacle] = []
 
 var _next_gate: int = 0
 var _crowd_x: float = 0.0
@@ -44,6 +45,9 @@ var _orbit: float = 0.0
 var _peak_count: int = 1
 var _pause_menu: PauseMenu = null
 var _autopilot: bool = false
+var _revive_used: bool = false
+var _fail_state: State = State.RUN
+var _hazard_sfx_cd: float = 0.0
 
 
 func _ready() -> void:
@@ -63,6 +67,14 @@ func _ready() -> void:
 		add_child(gp)
 		gp.build(-float(gd["d"]), str(gd["left"]), str(gd["right"]), gate_half)
 		gates.append(gp)
+	var oi: int = 0
+	for o: Variant in level.get("obstacles", []):
+		var od: Dictionary = o
+		var ob := CrowdObstacle.new()
+		add_child(ob)
+		ob.build(CrowdObstacle.kind_from_string(str(od["type"])), -float(od["d"]), CrowdTrack.HALF_WIDTH, level_num * 31 + oi)
+		obstacles.append(ob)
+		oi += 1
 
 	crowd = CrowdSwarm.new()
 	add_child(crowd)
@@ -148,6 +160,7 @@ func _begin_run() -> void:
 
 func _process(delta: float) -> void:
 	_react_cd -= delta
+	_hazard_sfx_cd -= delta
 	_clash_sfx_cd -= delta
 	match state:
 		State.RUN:
@@ -171,6 +184,7 @@ func _process(delta: float) -> void:
 func _update_run(delta: float) -> void:
 	_crowd_z -= RUN_SPEED * delta
 	_steer(delta, CrowdTrack.HALF_WIDTH)
+	_check_hazards()
 	while _next_gate < gates.size() and _crowd_z <= gates[_next_gate].z_pos:
 		_pass_gate(gates[_next_gate])
 		_next_gate += 1
@@ -180,6 +194,20 @@ func _update_run(delta: float) -> void:
 	if _crowd_z <= track.finish_z:
 		state = State.CLASH
 		AudioManager.play("whoosh", 0.05)
+
+
+func _check_hazards() -> void:
+	var ez: float = crowd.extent_z()
+	for ob: CrowdObstacle in obstacles:
+		if absf(ob.z_pos - _crowd_z) > ez + ob.reach_z:
+			continue
+		var lost: int = crowd.kill_where(ob)
+		if lost > 0 and _hazard_sfx_cd <= 0.0:
+			_hazard_sfx_cd = 0.08
+			AudioManager.play("unit_pop", 0.12, -2.0, 0.0)
+			Haptics.light()
+			Juice.screen_shake(0.08, 0.12)
+			Juice.floating_text(crowd.global_position + Vector3(0, 2.8, 0), "-%d" % lost, Palette.ENEMY_LIGHT, 0.9, 1.0, 0.5)
 
 
 func _steer(delta: float, half_width: float) -> void:
@@ -376,11 +404,13 @@ func _win() -> void:
 	add_child(es)
 	es.open(true, coins, "%d survivors!" % survivors if survivors > 0 else "Boss defeated!")
 	es.next_pressed.connect(_next_level)
+	_offer_upgrade(es)
 
 
 func _fail(reason: String) -> void:
 	if state == State.WIN or state == State.FAIL:
 		return
+	_fail_state = state
 	state = State.FAIL
 	crowd.run_amount = 0.0
 	enemy.run_amount = 0.0
@@ -394,6 +424,48 @@ func _fail(reason: String) -> void:
 	es.open(false, coins, reason)
 	es.retry_pressed.connect(GameState.reload)
 	es.home_pressed.connect(GameState.go_hub)
+	if not _revive_used:
+		es.add_revive()
+		es.revive_granted.connect(_revive)
+	_offer_upgrade(es)
+
+
+## Rewarded revive (once per level): fresh units and resume where we failed.
+func _revive() -> void:
+	_revive_used = true
+	var bonus: int = maxi(10, _peak_count / 2)
+	if _fail_state == State.CLASH:
+		bonus = maxi(bonus, enemy.count + 5)
+	elif _fail_state == State.BOSS_FIGHT:
+		bonus = maxi(bonus, boss.hp + 5)
+	crowd.set_count(bonus)
+	state = _fail_state
+	crowd.run_amount = 1.0
+	if state == State.CLASH:
+		enemy.run_amount = 1.0
+	Juice.burst(crowd.global_position + Vector3(0, 1.0, 0), Palette.GOLD, 1.3)
+	cam.kick_fov(8.0)
+	AudioManager.play("gate_good")
+	Haptics.heavy()
+	hud.toast("REVIVED!", Palette.GOLD)
+
+
+func _offer_upgrade(es: EndScreen) -> void:
+	es.add_upgrade(_start_crowd_title, _start_crowd_cost, _buy_start_crowd)
+
+
+func _start_crowd_title() -> String:
+	return "Starting crowd: %d  ->  %d" % [_start_count(), _start_count() + 1]
+
+
+func _buy_start_crowd() -> void:
+	var save: Dictionary = SaveSystem.game(GAME_ID)
+	save["start_crowd"] = SaveSystem.get_int(save, "start_crowd", 0) + 1
+	SaveSystem.save_game()
+
+
+func _start_crowd_cost() -> int:
+	return Economy.upgrade_cost(60, SaveSystem.get_int(SaveSystem.game(GAME_ID), "start_crowd", 0), 1.32)
 
 
 func _next_level() -> void:
