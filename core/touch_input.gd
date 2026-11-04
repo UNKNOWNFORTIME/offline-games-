@@ -42,6 +42,11 @@ func is_holding() -> bool:
 	return is_down and hold_time >= HOLD_DELAY
 
 
+## Total finger travel (px) since the current press began.
+func travel() -> float:
+	return _travel if is_down else 0.0
+
+
 func reset() -> void:
 	_touches.clear()
 	_primary = -1

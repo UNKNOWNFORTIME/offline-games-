@@ -12,7 +12,8 @@ uniform float flash : hint_range(0.0, 1.0) = 0.0;
 void fragment() {
 	vec3 c = base_color.rgb;
 	if (use_vertex_color) {
-		c *= COLOR.rgb;
+		// Vertex colors are authored in sRGB; lighting happens in linear.
+		c *= pow(COLOR.rgb, vec3(2.2));
 	}
 	c = mix(c, vec3(1.0), flash);
 	ALBEDO = c;

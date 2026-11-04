@@ -10,7 +10,7 @@ const VERSION: String = "0.2.0"
 const GAMES: Array = [
 	{"id": "crowd_rush", "title": "Crowd Rush", "tagline": "Grow your crowd. Crush the boss.", "scene": "res://games/crowd_rush/crowd_rush.tscn", "color": Color("#2F80FF")},
 	{"id": "stack_skater", "title": "Stack Skater", "tagline": "Stack coins. Mind the spikes.", "scene": "res://games/stack_skater/stack_skater.tscn", "color": Color("#FFC531")},
-	{"id": "overtake", "title": "Overtake", "tagline": "Weave traffic. Upgrade. Go further.", "scene": "", "color": Color("#FF3B3B")},
+	{"id": "overtake", "title": "Overtake", "tagline": "Weave traffic. Upgrade. Go further.", "scene": "res://games/overtake/overtake.tscn", "color": Color("#FF3B3B")},
 	{"id": "last_barricade", "title": "Last Barricade", "tagline": "Hold the line until dawn.", "scene": "", "color": Color("#36D399")},
 ]
 

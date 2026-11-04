@@ -121,6 +121,14 @@ func set_finger_visible(on: bool) -> void:
 	_finger.visible = on
 
 
+func set_title(t: String) -> void:
+	_level_label.text = t
+
+
+func set_progress_visible(on: bool) -> void:
+	_progress.visible = on
+
+
 func set_level(n: int) -> void:
 	_level_label.text = "LEVEL %d" % n
 

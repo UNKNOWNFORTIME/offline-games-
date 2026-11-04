@@ -72,6 +72,16 @@ func _draw() -> void:
 			var r := Rect2(c + Vector2(-30, -20) * u, Vector2(60, 40) * u)
 			draw_rect(r, color)
 			draw_colored_polygon(PackedVector2Array([c + Vector2(-8, -11) * u, c + Vector2(12, 0) * u, c + Vector2(-8, 11) * u]), Palette.GOLD_SHADOW)
+		"bolt":
+			draw_colored_polygon(PackedVector2Array([c + Vector2(6, -32) * u, c + Vector2(-18, 4) * u, c + Vector2(-2, 4) * u, c + Vector2(-8, 32) * u, c + Vector2(18, -6) * u, c + Vector2(2, -6) * u]), color)
+		"power":
+			for i: int in 3:
+				var oy: float = (14.0 - float(i) * 16.0) * u
+				draw_polyline(PackedVector2Array([c + Vector2(-22 * u, oy + 10 * u), c + Vector2(0, oy - 8 * u), c + Vector2(22 * u, oy + 10 * u)]), color, 8 * u, true)
+		"income":
+			_coin(c, s * 0.4)
+			var f: Font = ThemeDB.fallback_font
+			draw_string(f, c + Vector2(-11, 13) * u, "$", HORIZONTAL_ALIGNMENT_LEFT, -1, int(40 * u), Palette.GOLD_SHADOW.darkened(0.3))
 		"star":
 			var pts := PackedVector2Array()
 			for i: int in 10:
