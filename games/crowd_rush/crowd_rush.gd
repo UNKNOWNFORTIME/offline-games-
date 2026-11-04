@@ -43,6 +43,7 @@ var _react_cd: float = 0.0
 var _orbit: float = 0.0
 var _peak_count: int = 1
 var _pause_menu: PauseMenu = null
+var _autopilot: bool = false
 
 
 func _ready() -> void:
@@ -125,6 +126,12 @@ func _on_drag(delta: Vector2, _pos: Vector2) -> void:
 		_pending_dx += delta.x
 
 
+## CI smoke test: start and steer toward the better gate automatically.
+func smoke_start() -> void:
+	_autopilot = true
+	_begin_run()
+
+
 func _begin_run() -> void:
 	if state != State.READY or get_tree().paused:
 		return
@@ -176,6 +183,11 @@ func _update_run(delta: float) -> void:
 
 
 func _steer(delta: float, half_width: float) -> void:
+	if _autopilot and _next_gate < gates.size():
+		var g: GatePair = gates[_next_gate]
+		var l: int = GatePair.apply(g.ops[0], crowd.count)
+		var r: int = GatePair.apply(g.ops[1], crowd.count)
+		_target_x = g.side_center_x(0 if l >= r else 1) * 0.7
 	_target_x += _pending_dx * DRAG_SENS
 	_pending_dx = 0.0
 	var r: float = crowd.natural_radius()

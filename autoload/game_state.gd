@@ -31,6 +31,8 @@ func _ready() -> void:
 	t.tween_property(_fade, "modulate:a", 0.0, 0.35)
 	get_tree().set_auto_accept_quit(false)
 	get_tree().set_quit_on_go_back(false)
+	if OS.get_cmdline_user_args().has("--smoke"):
+		add_child(SmokeTest.new())
 
 
 func _process(delta: float) -> void:
